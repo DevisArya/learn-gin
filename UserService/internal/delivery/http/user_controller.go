@@ -15,13 +15,13 @@ import (
 
 type UserController interface {
 	Login(c *gin.Context)
-	// Logout(c *gin.Context)
+	Logout(c *gin.Context)
 	Create(c *gin.Context)
-	// UpdatePassword(c *gin.Context)
-	// UpdateEmail(c *gin.Context)
-	// UpdateNameProfile(c *gin.Context)
-	// Delete(c *gin.Context)
-	// FindById(c *gin.Context)
+	UpdatePassword(c *gin.Context)
+	UpdateEmail(c *gin.Context)
+	UpdateNameProfile(c *gin.Context)
+	Delete(c *gin.Context)
+	FindById(c *gin.Context)
 	FindAll(c *gin.Context)
 }
 
@@ -64,24 +64,26 @@ func (ctrl *UserControllerImpl) Login(c *gin.Context) {
 	helper.SendSuccessResponseWithData(c, http.StatusOK, "Login Successfully", data)
 }
 
-// // Logout implements AuthHandler.
-// func (ctrl *UserControllerImpl) Logout(c *gin.Context) {
+// Logout implements AuthHandler.
+func (ctrl *UserControllerImpl) Logout(c *gin.Context) {
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-// 	defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 
-// 	userID, err := helper.GetUserId(c)
-// 	if err != nil {
-// 		ctrl.Log.Errorf("[Logout] Failed to get user id: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
-// 	}
+	userID, err := helper.GetUserId(c)
+	if err != nil {
+		ctrl.Log.Errorf("[Logout] Failed to get user id: %v", err)
+		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
+		return
+	}
 
-// 	if err := ctrl.UserUseCase.Logout(ctx, userID); err != nil {
-// 		helper.SendCustomErrorResponse(c, err)
-// 	}
+	if err := ctrl.UserUseCase.Logout(ctx, userID); err != nil {
+		helper.SendCustomErrorResponse(c, err)
+		return
+	}
 
-// 	helper.SendSuccessResponse(c, http.StatusOK, "Logout Successfully")
-// }
+	helper.SendSuccessResponse(c, http.StatusOK, "Logout Successfully")
+}
 
 // Create implements CustomerController.
 func (ctrl *UserControllerImpl) Create(c *gin.Context) {
@@ -107,24 +109,26 @@ func (ctrl *UserControllerImpl) Create(c *gin.Context) {
 	helper.SendSuccessResponseWithData(c, http.StatusCreated, "user created successfully", data)
 }
 
-// // Delete implements CustomerController.
-// func (ctrl *UserControllerImpl) Delete(c *gin.Context) {
+// Delete implements CustomerController.
+func (ctrl *UserControllerImpl) Delete(c *gin.Context) {
 
-// 	userID, err := helper.GetUserId(c)
-// 	if err != nil {
-// 		ctrl.Log.Errorf("[Delete] Failed to get user id: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
-// 	}
+	userID, err := helper.GetUserId(c)
+	if err != nil {
+		ctrl.Log.Errorf("[Delete] Failed to get user id: %v", err)
+		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
+		return
+	}
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-// 	defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 
-// 	if err := ctrl.UserUseCase.Delete(ctx, userID); err != nil {
-// 		helper.SendCustomErrorResponse(c, err)
-// 	}
+	if err := ctrl.UserUseCase.Delete(ctx, userID); err != nil {
+		helper.SendCustomErrorResponse(c, err)
+		return
+	}
 
-// 	helper.SendSuccessResponse(c, http.StatusOK, "customer deleted sucessfully")
-// }
+	helper.SendSuccessResponse(c, http.StatusOK, "customer deleted sucessfully")
+}
 
 // FindAll implements CustomerController.
 func (ctrl *UserControllerImpl) FindAll(c *gin.Context) {
@@ -162,97 +166,108 @@ func (ctrl *UserControllerImpl) FindAll(c *gin.Context) {
 	helper.SendSuccessResponseWithPagination(c, http.StatusOK, "find users succesfully", data, paging)
 }
 
-// // FindById implements CustomerController.
-// func (ctrl *UserControllerImpl) FindById(c *gin.Context) {
-// 	userID, err := helper.GetUserId(c)
-// 	if err != nil {
-// 		ctrl.Log.Errorf("[FindById] Failed to get user id: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
-// 	}
+// FindById implements CustomerController.
+func (ctrl *UserControllerImpl) FindById(c *gin.Context) {
+	userID, err := helper.GetUserId(c)
+	if err != nil {
+		ctrl.Log.Errorf("[FindById] Failed to get user id: %v", err)
+		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
+		return
+	}
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-// 	defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 
-// 	data, err := ctrl.UserUseCase.FindById(ctx, userID)
+	data, err := ctrl.UserUseCase.FindById(ctx, userID)
 
-// 	if err != nil {
-// 		helper.SendCustomErrorResponse(c, err)
-// 	}
+	if err != nil {
+		helper.SendCustomErrorResponse(c, err)
+		return
+	}
 
-// 	helper.SendSuccessResponseWithData(c, http.StatusOK, "find user succesfully", data)
-// }
+	helper.SendSuccessResponseWithData(c, http.StatusOK, "find user succesfully", data)
+}
 
-// // UpdateEmail implements CustomerController.
-// func (ctrl *UserControllerImpl) UpdateEmail(c *gin.Context) {
-// 	var req dto.UserupdateEmailRequest
+// UpdateEmail implements CustomerController.
+func (ctrl *UserControllerImpl) UpdateEmail(c *gin.Context) {
+	var req dto.UserupdateEmailRequest
 
-// 	if err := c.ShouldBind(&req); err != nil {
-// 		ctrl.Log.Warnf("[UpdateEmail] Failed to parse request body: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"invalid request payload"})
-// 	}
+	if err := c.ShouldBind(&req); err != nil {
+		ctrl.Log.Warnf("[UpdateEmail] Failed to parse request body: %v", err)
+		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"invalid request payload"})
+		return
+	}
 
-// 	userID, err := helper.GetUserId(c)
-// 	if err != nil {
-// 		ctrl.Log.Errorf("[UpdateEmail] Failed to get user id: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
-// 	}
+	userID, err := helper.GetUserId(c)
+	if err != nil {
+		ctrl.Log.Errorf("[UpdateEmail] Failed to get user id: %v", err)
+		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
+		return
+	}
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-// 	defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
-// 	if err := ctrl.UserUseCase.UpdateEmail(ctx, &req, userID); err != nil {
-// 		helper.SendCustomErrorResponse(c, err)
-// 	}
+	if err := ctrl.UserUseCase.UpdateEmail(ctx, &req, userID); err != nil {
+		helper.SendCustomErrorResponse(c, err)
+		return
+	}
 
-// 	helper.SendSuccessResponse(c, http.StatusOK, "email updated successfully")
-// }
+	helper.SendSuccessResponse(c, http.StatusOK, "email updated successfully")
+}
 
 // UpdateNameProfile implements CustomerController.
-// func (ctrl *UserControllerImpl) UpdateNameProfile(c *gin.Context) {
-// 	var req dto.UserUpdateNameProfileRequest
+func (ctrl *UserControllerImpl) UpdateNameProfile(c *gin.Context) {
+	var req dto.UserUpdateNameProfileRequest
 
-// 	if err := c.ShouldBind(&req); err != nil {
-// 		ctrl.Log.Warnf("[UpdateName] Failed to parse request body: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"invalid request payload"})
-// 	}
+	if err := c.ShouldBind(&req); err != nil {
+		ctrl.Log.Warnf("[UpdateName] Failed to parse request body: %v", err)
+		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"invalid request payload"})
+		return
+	}
 
-// 	userID, err := helper.GetUserId(c)
-// 	if err != nil {
-// 		ctrl.Log.Errorf("[UpdateName] Failed to get user id: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
-// 	}
+	userID, err := helper.GetUserId(c)
+	if err != nil {
+		ctrl.Log.Errorf("[UpdateName] Failed to get user id: %v", err)
+		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
+		return
+	}
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-// 	defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
-// 	if err := ctrl.UserUseCase.UpdateNameProfile(ctx, &req, userID); err != nil {
-// 		helper.SendCustomErrorResponse(c, err)
-// 	}
+	if err := ctrl.UserUseCase.UpdateNameProfile(ctx, &req, userID); err != nil {
+		helper.SendCustomErrorResponse(c, err)
+		return
+	}
 
-// 	helper.SendSuccessResponse(c, http.StatusOK, "name profile updated successfully")
-// }
+	helper.SendSuccessResponse(c, http.StatusOK, "name profile updated successfully")
+}
 
 // UpdatePassword implements CustomerController.
-// func (ctrl *UserControllerImpl) UpdatePassword(c *gin.Context) {
-// 	var req dto.UserupdatePasswordRequest
+func (ctrl *UserControllerImpl) UpdatePassword(c *gin.Context) {
+	var req dto.UserupdatePasswordRequest
 
-// 	if err := c.ShouldBind(&req); err != nil {
-// 		ctrl.Log.Warnf("[UpdatePassword] Failed to parse request body: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"invalid request payload"})
-// 	}
+	if err := c.ShouldBind(&req); err != nil {
+		ctrl.Log.Warnf("[UpdatePassword] Failed to parse request body: %v", err)
+		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"invalid request payload"})
+		return
+	}
 
-// 	userID, err := helper.GetUserId(c)
-// 	if err != nil {
-// 		ctrl.Log.Errorf("[UpdatePassword] Failed to get user id: %v", err)
-// 		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
-// 	}
+	userID, err := helper.GetUserId(c)
+	if err != nil {
+		ctrl.Log.Errorf("[UpdatePassword] Failed to get user id: %v", err)
+		helper.SendErrorResponse(c, http.StatusUnauthorized, []string{err.Error()})
+		return
+	}
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-// 	defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
-// 	if err := ctrl.UserUseCase.UpdatePassword(ctx, &req, userID); err != nil {
-// 		helper.SendCustomErrorResponse(c, err)
-// 	}
+	if err := ctrl.UserUseCase.UpdatePassword(ctx, &req, userID); err != nil {
+		helper.SendCustomErrorResponse(c, err)
+		return
+	}
 
-// 	helper.SendSuccessResponse(c, http.StatusOK, "password updated successfully")
-// }
+	helper.SendSuccessResponse(c, http.StatusOK, "password updated successfully")
+}
