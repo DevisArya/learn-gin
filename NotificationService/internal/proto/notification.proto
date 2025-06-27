@@ -1,0 +1,26 @@
+syntax = "proto3";
+package notification;
+
+option go_package = "github.com/DevisArya/BE-challenge-syn/notification-service/internal/pb";
+
+import "google/protobuf/timestamp.proto";
+
+enum ActionType {
+  ACTION_TYPE_UNSPECIFIED = 0;
+  CREATE = 1;
+  UPDATE = 2;
+  DELETE = 3;
+}
+
+message UserActionRequest {
+  uint32 user_id = 1;
+  ActionType action = 2;
+  string description = 3;
+  google.protobuf.Timestamp occurred_at = 4;
+}
+
+message Empty {}
+
+service NotificationService {
+  rpc ReceiveUserAction(UserActionRequest) returns (Empty);
+}
