@@ -8,12 +8,12 @@ import (
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/dto"
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/helper"
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/usecase"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
 type NotificationController interface {
-	GetNotifications(c *fiber.Ctx) error
+	GetNotifications(c *gin.Context)
 }
 type NotificationControllerImpl struct {
 	NotificationUseCase usecase.NotificationUseCase
@@ -28,13 +28,14 @@ func NewNotificationController(NotificationUseCase usecase.NotificationUseCase, 
 }
 
 // GetNotifications implements NotificationController.
-func (n *NotificationControllerImpl) GetNotifications(c *fiber.Ctx) error {
+func (n *NotificationControllerImpl) GetNotifications(c *gin.Context) {
 
 	var req dto.GetNotificationRequest
 
-	if err := c.QueryParser(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		n.Log.Warnf("Invalid query parameters: %v", err)
-		return helper.SendErrorResponse(c, http.StatusBadRequest, []string{"Invalid query parameters"})
+		helper.SendErrorResponse(c, http.StatusBadRequest, []string{"Invalid query parameters"})
+		return
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -43,10 +44,11 @@ func (n *NotificationControllerImpl) GetNotifications(c *fiber.Ctx) error {
 	res, err := n.NotificationUseCase.GetNotifications(ctx, &req)
 	if err != nil {
 		n.Log.Errorf("Failed to get notifications: %v", err)
-		return helper.SendCustomErrorResponse(c, err)
+		helper.SendCustomErrorResponse(c, err)
+		return
 	}
 
 	n.Log.Infof("Successfully fetched notifications for UserID: %v", req.UserID)
 
-	return helper.SendSuccessResponseWithData(c, http.StatusOK, "success get notifications", res)
+	helper.SendSuccessResponseWithData(c, http.StatusOK, "success get notifications", res)
 }

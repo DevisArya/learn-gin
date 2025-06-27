@@ -2,13 +2,13 @@ package router
 
 import (
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/delivery/rest/controller"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 )
 
 type RouteConfig struct {
-	App                    *fiber.App
+	App                    *gin.Engine
 	NotificationController controller.NotificationController
-	AuthMiddleware         fiber.Handler
+	AuthMiddleware         gin.HandlerFunc
 }
 
 func (c *RouteConfig) Setup() {

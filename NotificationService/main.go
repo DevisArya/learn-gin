@@ -6,9 +6,8 @@ import (
 
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/config"
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/helper"
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -35,11 +34,11 @@ func main() {
 		}
 	}()
 
-	app := fiber.New()
+	app := gin.New()
 	config.InitialMigration(db)
-	app.Use(logger.New(logger.Config{
-		Format: "${time} ${status} - ${method} ${path} ${latency} \n",
-	}))
+	// app.Use(logger.New(logger.Config{
+	// 	Format: "${time} ${status} - ${method} ${path} ${latency} \n",
+	// }))
 	config.BootstrapRest(&config.BootstrapConfigRest{
 		DB:       db,
 		App:      app,
@@ -47,7 +46,12 @@ func main() {
 		Log:      log,
 	})
 
-	err := app.Listen(os.Getenv("NOTIF_PORT_REST"))
+	port := os.Getenv("NOTIF_PORT_REST")
+	if port == "" {
+		port = ":8080"
+	}
+
+	err := app.Run(port)
 	if err != nil {
 		log.Fatalf("Failed to start REST server: %v", err)
 	}

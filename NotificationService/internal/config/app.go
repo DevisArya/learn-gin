@@ -11,8 +11,8 @@ import (
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/pb"
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/repository"
 	"github.com/DevisArya/BE-challenge-syn/NotificationService/internal/usecase"
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -25,7 +25,7 @@ type BootstrapConfigGrpc struct {
 }
 type BootstrapConfigRest struct {
 	DB       *gorm.DB
-	App      *fiber.App
+	App      *gin.Engine
 	Validate *validator.Validate
 	Log      *logrus.Logger
 }
